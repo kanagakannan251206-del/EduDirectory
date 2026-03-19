@@ -1,0 +1,144 @@
+{
+  "staff_members": [
+    {
+      "id": "AI-001",
+      "name": "Dr. V. Kalaivani",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Professor & Head",
+      "email_id": "hodai@nec.edu.in",
+      "ph_no": "9842637770",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/211484",
+      "linkedin_profile": "https://www.linkedin.com/in/dr-v-kalaivani-066970153"
+    },
+    {
+      "id": "AI-002",
+      "name": "Dr. J. Naskath",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Associate Professor",
+      "email_id": "naskat@nec.edu.in",
+      "ph_no": "9894800982",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/211475",
+      "linkedin_profile": "https://www.linkedin.com/in/naskath-jahangeer-31a3b6280"
+    },
+    {
+      "id": "AI-003",
+      "name": "Shenbagharaman A",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor (Sr.Grade)",
+      "email_id": "shenbagharaman@gmail.com",
+      "ph_no": "9944682845",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/252862",
+      "linkedin_profile": "https://www.linkedin.com/in/shenbagaraman-s-551103268"
+    },
+    {
+      "id": "AI-004",
+      "name": "V. Veera Anusuya",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor (Sr.Grade)",
+      "email_id": "veeraanusuya_cse@nec.edu.in",
+      "ph_no": "6379188336",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/273153",
+      "linkedin_profile": "https://www.linkedin.com/in/dr-veera-anusuya-356159257"
+    },
+    {
+      "id": "AI-005",
+      "name": "K. Poorani",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "poorani-ai@nec.edu.in",
+      "ph_no": "9578022148",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/338109",
+      "linkedin_profile": "https://www.linkedin.com/in/poorani-balakrishnan-8991a92a6"
+    },
+    {
+      "id": "AI-006",
+      "name": "P. Rampriya",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "rampriya-aids@nec.edu.in",
+      "ph_no": "9624646094",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/381595",
+      "linkedin_profile": "https://www.linkedin.com/in/rampriya-p-6897b662"
+    },
+    {
+      "id": "AI-007",
+      "name": "Dhivya G",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "dhivya-aids@nec.edu.in",
+      "ph_no": "8883316620",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/391403/MzkxNDAz",
+      "linkedin_profile": "https://www.linkedin.com/in/dhivya-gopi-19981a2a6"
+    },
+    {
+      "id": "AI-008",
+      "name": "P. Swarna Gowsalya",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "swarna-aids@nec.edu.in",
+      "ph_no": "9047675038",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/552290",
+      "linkedin_profile": "https://www.linkedin.com/in/swarna-gowsalya-p-04287a352"
+    },
+    {
+      "id": "AI-009",
+      "name": "M. Saranya",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "saranyaai@nec.edu.in",
+      "ph_no": "6383260220",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/625480/NjI1NDgw",
+      "linkedin_profile": "https://www.linkedin.com/in/saranya-m-24b539353"
+    },
+    {
+      "id": "AI-010",
+      "name": "N. Subhashini",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "subhashinidinakaran17@gmail.com",
+      "ph_no": "8248895582",
+      "vidwan_link": "https://vidwan.inflibnet.ac.in/profile/630906/NjMwOTA2",
+      "linkedin_profile": null
+    },
+    {
+      "id": "AI-011",
+      "name": "Jeyaseelan R",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "jeyaseelanmrj@gmail.com",
+      "ph_no": "8220106326",
+      "vidwan_link": null,
+      "linkedin_profile": "https://www.linkedin.com/in/jeyaseelanr2002r"
+    },
+    {
+      "id": "AI-012",
+      "name": "Renganayaki .S",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "renganayaki.it@gmail.com",
+      "ph_no": "8940305492",
+      "vidwan_link": null,
+      "linkedin_profile": null
+    },
+    {
+      "id": "AI-013",
+      "name": "Madhubala R",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Assistant Professor",
+      "email_id": "madhubala.engineer@gmail.com",
+      "ph_no": "7339250787",
+      "vidwan_link": null,
+      "linkedin_profile": null
+    },
+    {
+      "id": "AI-014",
+      "name": "Ravirathinam Duraikannu",
+      "department": "Artificial Intelligence and Data Science",
+      "designation": "Professor of Practice",
+      "email_id": "ravirathinam@gmail.com",
+      "ph_no": "8754474944",
+      "vidwan_link": null,
+      "linkedin_profile": null
+    }
+  ]
+}
