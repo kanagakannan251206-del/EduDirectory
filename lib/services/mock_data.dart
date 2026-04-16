@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 class MockDataService {
   static List<StaffMember>? _cachedStaff;
 
+  /// Loads all 14 Staff members from assets/data/staff.json
   static Future<List<StaffMember>> loadStaffFromAssets() async {
     if (_cachedStaff != null) return _cachedStaff!;
 
     try {
-      // Load the JSON file from assets
       final String jsonString = await rootBundle.loadString('assets/data/staff.json');
       final Map<String, dynamic> jsonData = jsonDecode(jsonString);
       final List<dynamic> staffList = jsonData['staff_members'];
@@ -19,25 +19,17 @@ class MockDataService {
         final i = entry.key;
         final s = entry.value;
         
-        // --- DATA EXTRACTION ---
         final String id = s['id'] ?? 's${i + 1}';
-        
-        // CRITICAL FOR CHATBOT: Trim name to ensure matching works perfectly
         final String name = (s['name'] ?? 'Unknown').toString().trim();
-        
-        // FIXED: Using the exact department name to match Dropdowns
         final String dept = s['department'] ?? 'Artificial Intelligence and Data Science';
         
-        // MAPPING JSON KEYS (handling email_id and ph_no aliases)
+        // JSON mapping for NEC Staff Directory standards
         final String email = s['email_id'] ?? s['email'] ?? ''; 
         final String phone = s['ph_no'] ?? s['phone'] ?? '';
         
-        // LINKS
         final String? vidwan = s['vidwan_link'];
         final String? linkedin = s['linkedin_profile'];
 
-        // --- ROLE LOGIC ---
-        // HOD Logic: Match by ID or Designation keyword
         final bool isActualHod = (id == 'AI-001' || (s['designation']?.toString().contains('Head') ?? false));
         
         StaffRole role = StaffRole.staff;
@@ -63,15 +55,14 @@ class MockDataService {
           role: role,
           designation: s['designation'] ?? 'Assistant Professor',
           employeeId: id,
-          joiningDate: DateTime(2020, 1, 1),
+          joiningDate: DateTime(2022, 1, 1),
           isEmergencyContact: isActualHod, 
           emergencyNote: isActualHod ? 'Head of Department' : '',
           isActive: true,
           availability: AvailabilityStatus.available,
           vidwanLink: vidwan,
           linkedinProfile: linkedin,
-          // Fallback for avatar logic in common_widgets
-          profileImageUrl: '', 
+          profileImageUrl: '', // Fallback handled by UI
           qualification: '',
           specialization: '',
           bio: '',
@@ -80,7 +71,7 @@ class MockDataService {
 
       return _cachedStaff!;
     } catch (e) {
-      debugPrint('Error loading staff data from assets: $e');
+      debugPrint('Error loading staff data: $e');
       return [];
     }
   }
@@ -96,7 +87,7 @@ class MockDataService {
         floor: '3rd Floor',
         phone: '9842637770',
         email: 'hodai@nec.edu.in',
-        color: const Color(0xFF4361EE),
+        color: const Color(0xFF1A237E), 
       ),
     ];
   }
@@ -105,29 +96,53 @@ class MockDataService {
     return [
       AppNotification(
         id: 'n1',
-        title: 'Welcome to NEC Directory',
-        message: 'The Staff directory is now live. Find and contact faculty easily.',
-        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+        title: 'System Update',
+        message: 'Staff profile editing is now restricted to individual owners.',
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
         type: 'info',
       ),
     ];
   }
 
+  /// Centralized User List for Authentication (Admin + 14 Staff)
   static List<AppUser> getUsers() {
-    return [
+    // 1. Primary Admin Account
+    List<AppUser> users = [
       AppUser(
-        id: 'u1', 
-        name: 'Admin', 
+        id: 'admin_01', 
+        name: 'NEC Admin', 
         email: 'admin@nec.edu.in', 
         role: UserRole.admin,
       ),
-      AppUser(
-        id: 'u2', 
-        name: 'Student', 
-        email: 'student@nec.edu.in', 
-        role: UserRole.viewer, 
-        studentId: 'STU-001',
-      ),
     ];
+
+    // 2. All 14 Staff Members as Editors (from your JSON)
+    final List<Map<String, String>> staffAccounts = [
+      {"name": "Dr. V. Kalaivani", "email": "hodai@nec.edu.in"},
+      {"name": "Dr. J. Naskath", "email": "naskat@nec.edu.in"},
+      {"name": "Shenbagharaman A", "email": "shenbagharaman@gmail.com"},
+      {"name": "V. Veera Anusuya", "email": "veeraanusuya_cse@nec.edu.in"},
+      {"name": "K. Poorani", "email": "poorani-ai@nec.edu.in"},
+      {"name": "P. Rampriya", "email": "rampriya-aids@nec.edu.in"},
+      {"name": "Dhivya G", "email": "dhivya-aids@nec.edu.in"},
+      {"name": "P. Swarna Gowsalya", "email": "swarna-aids@nec.edu.in"},
+      {"name": "M. Saranya", "email": "saranyaai@nec.edu.in"},
+      {"name": "N. Subhashini", "email": "subhashinidinakaran17@gmail.com"},
+      {"name": "Jeyaseelan R", "email": "jeyaseelanmrj@gmail.com"},
+      {"name": "Renganayaki .S", "email": "renganayaki.it@gmail.com"},
+      {"name": "Madhubala R", "email": "madhubala.engineer@gmail.com"},
+      {"name": "Ravirathinam Duraikannu", "email": "ravirathinam@gmail.com"},
+    ];
+
+    for (int i = 0; i < staffAccounts.length; i++) {
+      users.add(AppUser(
+        id: 'staff_${i + 1}',
+        name: staffAccounts[i]['name']!,
+        email: staffAccounts[i]['email']!,
+        role: UserRole.editor, // Grants Editor Dashboard access
+      ));
+    }
+
+    return users;
   }
 }

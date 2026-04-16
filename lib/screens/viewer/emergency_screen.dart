@@ -64,7 +64,8 @@ class EmergencyScreen extends StatelessWidget {
 
           // List of Emergency Contacts
           contacts.isEmpty
-              ? const SliverFillRemaining(
+              ? SliverFillRemaining(
+                  // FIXED: Removed 'const' keyword
                   child: EmptyState(
                     icon: Icons.contact_emergency_outlined,
                     title: 'No Emergency Contacts',

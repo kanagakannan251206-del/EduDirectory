@@ -4,6 +4,8 @@ import '../models/models.dart';
 import '../providers/app_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/common_widgets.dart';
+
+// Screen Imports
 import 'viewer/home_screen.dart';
 import 'viewer/directory_screen.dart';
 import 'viewer/favorites_screen.dart';
@@ -22,21 +24,22 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _selectedIndex = 0;
 
+  // FIXED: Removed 'const' keywords from these lists to allow dynamic widget building
   List<Widget> get _viewerScreens => [
-    const HomeScreen(),
-    const DirectoryScreen(),
-    const FavoritesScreen(),
-    const NotificationsScreen(),
-    const ProfileScreen(),
-  ];
+        HomeScreen(),
+        DirectoryScreen(),
+        FavoritesScreen(),
+        NotificationsScreen(),
+        ProfileScreen(),
+      ];
 
   List<Widget> get _adminScreens => [
-    const AdminDashboardScreen(),
-    const DirectoryScreen(),
-    const FavoritesScreen(),
-    const NotificationsScreen(),
-    const ProfileScreen(),
-  ];
+        AdminDashboardScreen(),
+        DirectoryScreen(),
+        FavoritesScreen(),
+        NotificationsScreen(),
+        ProfileScreen(),
+      ];
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +92,7 @@ class _MainShellState extends State<MainShell> {
               activeIcon: Icon(Icons.favorite),
               label: 'Favorites',
             ),
+            // FIXED: Removed 'const' from the Item wrapping NotificationBell since it uses dynamic count
             BottomNavigationBarItem(
               icon: Consumer<AppProvider>(
                 builder: (_, p, __) => NotificationBell(

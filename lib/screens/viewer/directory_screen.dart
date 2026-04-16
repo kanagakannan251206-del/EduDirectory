@@ -5,7 +5,7 @@ import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
-// FIXED: Essential import for navigation
+// Essential import for navigation
 import 'staff_detail_screen.dart';
 
 class DirectoryScreen extends StatefulWidget {
@@ -46,6 +46,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
       body: Column(
         children: [
           const SizedBox(height: 12),
+          // FIXED: Removed const
           AppSearchBar(
             hint: 'Search by name, subject, ID...',
             onChanged: provider.setSearchQuery,
@@ -90,6 +91,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           // --- Staff List Results ---
           Expanded(
             child: staff.isEmpty
+                // FIXED: Removed const
                 ? EmptyState(
                     icon: Icons.search_off,
                     title: 'No faculty matches found',
@@ -99,7 +101,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
                   )
                 : ListView.builder(
                     itemCount: staff.length,
-                    padding: const EdgeInsets.only(bottom: 100), // Padding for FAB or BottomNav
+                    padding: const EdgeInsets.only(bottom: 100),
                     itemBuilder: (ctx, i) {
                       final s = staff[i];
                       return StaffCard(
@@ -129,11 +131,11 @@ class _FilterPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12), // Reduced padding for compact look
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppTheme.divider.withOpacity(0.5)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
       ),
@@ -143,48 +145,44 @@ class _FilterPanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Refine Search', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.primaryNavy)),
-              TextButton(onPressed: provider.clearFilters, child: const Text('Reset', style: TextStyle(fontSize: 12))),
+              const Text('Refine Search', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryNavy)),
+              TextButton(
+                onPressed: provider.clearFilters, 
+                style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                child: const Text('Reset', style: TextStyle(fontSize: 11)),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
           
-          // Department Scroll
-          _FilterSectionHeader(title: 'Department'),
+          _FilterSectionHeader(title: 'DEPARTMENT'),
           _ScrollFilterRow(
             items: ['All', ...provider.departments.map((d) => d.name)],
             selectedItem: provider.selectedDepartment,
             onSelect: (val) => provider.setSelectedDepartment(val),
           ),
           
-          const SizedBox(height: 16),
-          
-          // Role Scroll
-          _FilterSectionHeader(title: 'Academic Role'),
+          const SizedBox(height: 12),
+          _FilterSectionHeader(title: 'ACADEMIC ROLE'),
           _ScrollFilterRow(
             items: [null, ...StaffRole.values],
             selectedItem: provider.selectedRole,
-            itemLabel: (role) => role == null ? 'All Roles' : (role as StaffRole).label,
+            itemLabel: (role) => role == null ? 'All' : (role as StaffRole).label,
             onSelect: (val) => provider.setSelectedRole(val as StaffRole?),
           ),
           
-          const SizedBox(height: 16),
-          
-          // Availability Scroll
-          _FilterSectionHeader(title: 'Status'),
+          const SizedBox(height: 12),
+          _FilterSectionHeader(title: 'STATUS'),
           _ScrollFilterRow(
             items: [null, ...AvailabilityStatus.values],
             selectedItem: provider.selectedAvailability,
-            itemLabel: (status) => status == null ? 'Any Status' : (status as AvailabilityStatus).label,
+            itemLabel: (status) => status == null ? 'Any' : (status as AvailabilityStatus).label,
             onSelect: (val) => provider.setSelectedAvailability(val as AvailabilityStatus?),
           ),
           
-          const SizedBox(height: 12),
-          
-          // Emergency Switch
           SwitchListTile.adaptive(
             contentPadding: EdgeInsets.zero,
-            title: const Text('Show Emergency Contacts Only', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+            visualDensity: VisualDensity.compact,
+            title: const Text('Emergency Contacts Only', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
             value: provider.showEmergencyOnly,
             onChanged: provider.setShowEmergencyOnly,
             activeColor: AppTheme.accentCoral,
@@ -195,16 +193,14 @@ class _FilterPanel extends StatelessWidget {
   }
 }
 
-// --- Internal UI Components ---
-
 class _FilterSectionHeader extends StatelessWidget {
   final String title;
   const _FilterSectionHeader({required this.title});
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
-      child: Text(title, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.5)),
+      padding: const EdgeInsets.only(bottom: 4.0),
+      child: Text(title, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.8)),
     );
   }
 }
@@ -228,18 +224,18 @@ class _ScrollFilterRow extends StatelessWidget {
           return GestureDetector(
             onTap: () => onSelect(item),
             child: Container(
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              margin: const EdgeInsets.only(right: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isSelected ? AppTheme.primaryNavy : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: isSelected ? AppTheme.primaryNavy : AppTheme.divider),
               ),
               child: Text(
                 label,
                 style: TextStyle(
                   color: isSelected ? Colors.white : AppTheme.textSecondary,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
               ),
@@ -260,20 +256,20 @@ class _FilterChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(left: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: AppTheme.primaryNavy.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: AppTheme.primaryNavy.withOpacity(0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: const TextStyle(fontSize: 11, color: AppTheme.primaryNavy, fontWeight: FontWeight.bold)),
+          Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.primaryNavy, fontWeight: FontWeight.bold)),
           const SizedBox(width: 4),
           GestureDetector(
             onTap: onRemove,
-            child: const Icon(Icons.cancel, size: 14, color: AppTheme.primaryNavy),
+            child: const Icon(Icons.cancel, size: 12, color: AppTheme.primaryNavy),
           ),
         ],
       ),

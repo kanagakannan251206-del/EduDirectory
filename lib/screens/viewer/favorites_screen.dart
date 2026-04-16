@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import '../../providers/app_provider.dart';
 import '../../widgets/common_widgets.dart';
 import '../../theme/app_theme.dart';
-// Ensure this path matches your folder structure
 import 'staff_detail_screen.dart'; 
 
 class FavoritesScreen extends StatelessWidget {
@@ -11,7 +10,7 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Watch the provider for changes in the favorites list
+    // watch triggers a rebuild when any staff member is favorited/unfavorited
     final provider = context.watch<AppProvider>();
     final favs = provider.favoriteStaff;
 
@@ -22,19 +21,19 @@ class FavoritesScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: favs.isEmpty
-          ? const EmptyState(
-              icon: Icons.favorite_border,
+          // FIXED: Removed 'const' to support updated dynamic EmptyState widget
+          ? EmptyState(
+              icon: Icons.favorite_border_rounded, 
               title: 'No Favorites Yet',
               subtitle: 'Tap the heart icon on any staff profile to save them here for quick access.',
             )
           : ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 8),
               itemCount: favs.length,
               itemBuilder: (ctx, i) {
                 final s = favs[i];
                 return StaffCard(
-                  // ValueKey is vital here so Flutter doesn't get confused 
-                  // when an item is removed from the list
+                  // Key ensures smooth animations when items are removed from the list
                   key: ValueKey(s.id),
                   staff: s,
                   isFavorite: true, 

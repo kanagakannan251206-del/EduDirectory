@@ -5,7 +5,7 @@ import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
-// FIXED: Essential import for detail view navigation
+// Essential import for detail view navigation
 import 'staff_detail_screen.dart';
 
 class DepartmentScreen extends StatelessWidget {
@@ -28,7 +28,6 @@ class DepartmentScreen extends StatelessWidget {
             pinned: true,
             backgroundColor: color,
             elevation: 0,
-            // FIXED: Removed invalid 'margin' from CircleAvatar
             leading: Padding(
               padding: const EdgeInsets.only(left: 12.0),
               child: IconButton(
@@ -126,7 +125,8 @@ class DepartmentScreen extends StatelessWidget {
 
           // --- Faculty List ---
           staff.isEmpty
-              ? const SliverToBoxAdapter(
+              ? SliverToBoxAdapter(
+                  // FIXED: Removed 'const' keyword to allow dynamic widget usage
                   child: EmptyState(
                     icon: Icons.group_off,
                     title: 'No Faculty Listed',

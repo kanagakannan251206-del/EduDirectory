@@ -91,7 +91,6 @@ class StaffMember {
   final bool isVerified;
   final String extension; 
   
-  // Specific links from your staff.json
   final String? vidwanLink;
   final String? linkedinProfile;
 
@@ -134,7 +133,6 @@ class StaffMember {
     return StaffMember(
       id: json['id'] ?? '', 
       name: json['name'] ?? '',
-      // Handles both your JSON keys (email_id) and model keys (email)
       email: json['email_id'] ?? json['email'] ?? '',
       phone: json['ph_no'] ?? json['phone'],
       whatsapp: json['whatsapp'] ?? json['ph_no'] ?? '',
@@ -171,7 +169,6 @@ class StaffMember {
       socialLinks: Map<String, String>.from(json['socialLinks'] ?? {}),
       isVerified: json['isVerified'] ?? false,
       extension: json['extension'] ?? '',
-      // Links from staff.json
       vidwanLink: json['vidwan_link'] ?? json['vidwanLink'],
       linkedinProfile: json['linkedin_profile'] ?? json['linkedinProfile'],
     );
@@ -180,8 +177,8 @@ class StaffMember {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
-    'email_id': email, // Matching JSON export key
-    'ph_no': phone,    // Matching JSON export key
+    'email_id': email,
+    'ph_no': phone,
     'whatsapp': whatsapp,
     'department': department,
     'subDepartment': subDepartment,

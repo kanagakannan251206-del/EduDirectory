@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../models/models.dart';
 import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
+import '../admin/add_edit_staff_screen.dart';
+import '../admin/admin_dashboard_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -10,11 +12,18 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
+    // If for some reason the user is null, we return a loader or empty state
+    if (provider.currentUser == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    
     final user = provider.currentUser!;
 
-    final roleColor = user.role == UserRole.admin ? AppTheme.accentCoral
-        : user.role == UserRole.editor ? AppTheme.accentTeal
-        : AppTheme.accentGold;
+    final roleColor = user.role == UserRole.admin 
+        ? AppTheme.accentCoral
+        : user.role == UserRole.editor 
+            ? AppTheme.accentTeal
+            : AppTheme.accentGold;
 
     return Scaffold(
       appBar: AppBar(
@@ -59,7 +68,7 @@ class ProfileScreen extends StatelessWidget {
                     radius: 40,
                     backgroundColor: roleColor.withOpacity(0.2),
                     child: Text(
-                      user.name.split(' ').take(2).map((n) => n[0]).join(),
+                      user.name.split(' ').take(2).map((n) => n.isNotEmpty ? n[0] : '').join(),
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: roleColor),
                     ),
                   ),
@@ -67,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
                   Text(user.name, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
                   Text(user.email, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 14)),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
@@ -87,25 +96,83 @@ class ProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  _SettingsTile(icon: Icons.favorite, label: 'My Favorites', subtitle: '${provider.favoriteStaff.length} saved', color: AppTheme.accentCoral, onTap: () {}),
-                  _SettingsTile(icon: Icons.notifications, label: 'Notifications', subtitle: '${provider.unreadNotificationCount} unread', color: AppTheme.accentTeal, onTap: () {}),
+                  _SettingsTile(
+                    icon: Icons.favorite, 
+                    label: 'My Favorites', 
+                    subtitle: '${provider.favoriteStaff.length} saved', 
+                    color: AppTheme.accentCoral, 
+                    onTap: () {
+                      // Logic to view favorites
+                    }
+                  ),
+                  _SettingsTile(
+                    icon: Icons.notifications, 
+                    label: 'Notifications', 
+                    subtitle: '${provider.unreadNotificationCount} unread', 
+                    color: AppTheme.accentTeal, 
+                    onTap: () {
+                      // Logic to view notifications
+                    }
+                  ),
+                  
                   if (user.role == UserRole.admin) ...[
                     const Divider(),
-                    _SettingsTile(icon: Icons.admin_panel_settings, label: 'Admin Dashboard', subtitle: 'Manage staff & settings', color: AppTheme.accentCoral, onTap: () {}),
+                    _SettingsTile(
+                      icon: Icons.admin_panel_settings, 
+                      label: 'Admin Dashboard', 
+                      subtitle: 'Manage staff & settings', 
+                      color: AppTheme.accentCoral, 
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+                        );
+                      }
+                    ),
                   ],
+
                   if (user.role == UserRole.editor) ...[
                     const Divider(),
-                    _SettingsTile(icon: Icons.edit, label: 'Department Editor', subtitle: user.department ?? 'Your department', color: AppTheme.accentTeal, onTap: () {}),
+                    _SettingsTile(
+                      icon: Icons.edit, 
+                      label: 'Department Editor', 
+                      subtitle: 'Update your professional profile', 
+                      color: AppTheme.accentTeal, 
+                      onTap: () {
+                        // Find the staff member details matching the logged-in user
+                        final staffMember = provider.allStaff.firstWhere(
+                          (s) => s.email.toLowerCase() == user.email.toLowerCase(),
+                          orElse: () => throw Exception("Staff profile not found"),
+                        );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddEditStaffScreen(
+                              staff: staffMember,
+                              isEditing: true,
+                            ),
+                          ),
+                        );
+                      }
+                    ),
                   ],
+
                   const Divider(),
-                  _SettingsTile(icon: Icons.info_outline, label: 'About App', subtitle: 'EduDirectory v1.0.0', color: AppTheme.primaryNavy, onTap: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationName: 'EduDirectory',
-                      applicationVersion: '1.0.0',
-                      applicationLegalese: '© 2024 College Staff Directory',
-                    );
-                  }),
+                  _SettingsTile(
+                    icon: Icons.info_outline, 
+                    label: 'About App', 
+                    subtitle: 'EduDirectory v1.0.0', 
+                    color: AppTheme.primaryNavy, 
+                    onTap: () {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'EduDirectory',
+                        applicationVersion: '1.0.0',
+                        applicationLegalese: '© 2026 NEC Staff Directory',
+                      );
+                    }
+                  ),
                 ],
               ),
             ),
@@ -122,7 +189,14 @@ class _SettingsTile extends StatelessWidget {
   final String subtitle;
   final Color color;
   final VoidCallback onTap;
-  const _SettingsTile({required this.icon, required this.label, required this.subtitle, required this.color, required this.onTap});
+  
+  const _SettingsTile({
+    required this.icon, 
+    required this.label, 
+    required this.subtitle, 
+    required this.color, 
+    required this.onTap
+  });
 
   @override
   Widget build(BuildContext context) {

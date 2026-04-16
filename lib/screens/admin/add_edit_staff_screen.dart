@@ -7,13 +7,15 @@ import '../../theme/app_theme.dart';
 
 class AddEditStaffScreen extends StatefulWidget {
   final StaffMember? staff;
-  const AddEditStaffScreen({super.key, this.staff});
+  final bool isEditing; // Added to clarify intent from Staff Dashboard
+
+  const AddEditStaffScreen({super.key, this.staff, this.isEditing = false});
 
   @override
   State<AddEditStaffScreen> createState() => _AddEditStaffScreenState();
 }
 
-class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
+class _AddEditStaffScreenState extends State<AddEditStaffScreen> with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   
   // Controllers
@@ -36,7 +38,7 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
   bool _isEmergencyContact = false;
   bool _isActive = true;
 
-  bool get isEditing => widget.staff != null;
+  bool get isUpdating => widget.staff != null;
 
   @override
   void initState() {
@@ -50,7 +52,6 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
     _specializationCtrl = TextEditingController(text: s?.specialization ?? '');
     _officeCtrl = TextEditingController(text: s?.officeLocation ?? '');
     _bioCtrl = TextEditingController(text: s?.bio ?? '');
-    // FIXED: Changed linkedinUrl to linkedinProfile
     _linkedinCtrl = TextEditingController(text: s?.linkedinProfile ?? '');
     _vidwanCtrl = TextEditingController(text: s?.vidwanLink ?? ''); 
     _employeeIdCtrl = TextEditingController(text: s?.employeeId ?? '');
@@ -99,7 +100,6 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
       specialization: _nullIfEmpty(_specializationCtrl.text),
       officeLocation: _nullIfEmpty(_officeCtrl.text),
       bio: _nullIfEmpty(_bioCtrl.text),
-      // FIXED: parameter name changed to linkedinProfile
       linkedinProfile: _nullIfEmpty(_linkedinCtrl.text),
       vidwanLink: _nullIfEmpty(_vidwanCtrl.text), 
       employeeId: _nullIfEmpty(_employeeIdCtrl.text) ?? 'EMP-${DateTime.now().millisecondsSinceEpoch}',
@@ -110,7 +110,7 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
       isActive: _isActive,
     );
 
-    if (isEditing) {
+    if (isUpdating) {
       provider.updateStaff(staff);
     } else {
       provider.addStaff(staff);
@@ -118,17 +118,26 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
 
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(isEditing ? 'Staff updated successfully' : 'Staff added successfully')),
+      SnackBar(
+        content: Text(isUpdating ? 'Profile updated successfully' : 'Staff added successfully'),
+        backgroundColor: AppTheme.primaryNavy,
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<AppProvider>();
+    // Check if the current user is an Admin or just a Staff editing themselves
+    final bool isAdmin = provider.currentUser?.role == UserRole.admin;
 
     return Scaffold(
       backgroundColor: AppTheme.surfaceLight,
-      appBar: AppBar(title: Text(isEditing ? 'Edit Staff' : 'Add New Staff')),
+      appBar: AppBar(
+        title: Text(isUpdating ? 'Update Profile' : 'Add New Staff'),
+        backgroundColor: AppTheme.primaryNavy,
+        foregroundColor: Colors.white,
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -140,95 +149,109 @@ class _AddEditStaffScreenState extends State<AddEditStaffScreen> {
                 title: 'Basic Information',
                 children: [
                   _Field(controller: _nameCtrl, label: 'Full Name', icon: Icons.person, required: true),
-                  _Field(controller: _emailCtrl, label: 'Email Address', icon: Icons.email, keyboardType: TextInputType.emailAddress, required: true),
+                  _Field(
+                    controller: _emailCtrl, 
+                    label: 'Email Address', 
+                    icon: Icons.email, 
+                    keyboardType: TextInputType.emailAddress, 
+                    required: true,
+                    enabled: isAdmin, // Only Admin can change official email
+                  ),
                   _Field(controller: _phoneCtrl, label: 'Phone Number', icon: Icons.phone, keyboardType: TextInputType.phone),
-                  _Field(controller: _employeeIdCtrl, label: 'Employee ID', icon: Icons.badge),
+                  _Field(controller: _employeeIdCtrl, label: 'Employee ID', icon: Icons.badge, enabled: isAdmin),
                 ],
               ),
               const SizedBox(height: 16),
               _Section(
                 title: 'Department & Role',
                 children: [
+                  // Disable Department selection for Staff
                   DropdownButtonFormField<String>(
                     value: _selectedDept, 
                     decoration: const InputDecoration(labelText: 'Department', prefixIcon: Icon(Icons.business)),
                     items: provider.departments.map((d) => DropdownMenuItem(value: d.name, child: Text(d.name))).toList(),
-                    onChanged: (v) => setState(() => _selectedDept = v!),
+                    onChanged: isAdmin ? (v) => setState(() => _selectedDept = v!) : null,
                   ),
                   const SizedBox(height: 12),
+                  // Disable Role selection for Staff
                   DropdownButtonFormField<StaffRole>(
                     value: _selectedRole,
-                    decoration: const InputDecoration(labelText: 'Role', prefixIcon: Icon(Icons.work)),
+                    decoration: const InputDecoration(labelText: 'Staff Category', prefixIcon: Icon(Icons.work)),
                     items: StaffRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.label))).toList(),
-                    onChanged: (v) => setState(() => _selectedRole = v!),
+                    onChanged: isAdmin ? (v) => setState(() => _selectedRole = v!) : null,
                   ),
                   const SizedBox(height: 12),
-                  _Field(controller: _designationCtrl, label: 'Designation', icon: Icons.title, required: true),
+                  _Field(controller: _designationCtrl, label: 'Designation', icon: Icons.title, required: true, enabled: isAdmin),
                 ],
               ),
               const SizedBox(height: 16),
               _Section(
-                title: 'Academic Details',
+                title: 'Academic & Professional',
                 children: [
                   _Field(controller: _qualificationCtrl, label: 'Qualification', icon: Icons.school),
                   _Field(controller: _specializationCtrl, label: 'Specialization', icon: Icons.auto_awesome),
                   _Field(controller: _officeCtrl, label: 'Office Location', icon: Icons.location_on),
+                  _Field(controller: _bioCtrl, label: 'Short Bio', icon: Icons.description, maxLines: 3),
                 ],
               ),
               const SizedBox(height: 16),
               _Section(
-                title: 'Profile & Links',
+                title: 'Professional Links',
                 children: [
-                  _Field(controller: _bioCtrl, label: 'Bio', icon: Icons.description, maxLines: 3),
-                  _Field(controller: _linkedinCtrl, label: 'LinkedIn URL', icon: Icons.link, keyboardType: TextInputType.url),
-                  _Field(controller: _vidwanCtrl, label: 'Vidwan URL', icon: Icons.school, keyboardType: TextInputType.url),
+                  _Field(controller: _linkedinCtrl, label: 'LinkedIn Profile URL', icon: Icons.link, keyboardType: TextInputType.url),
+                  _Field(controller: _vidwanCtrl, label: 'Vidwan Profile URL', icon: Icons.school, keyboardType: TextInputType.url),
                 ],
               ),
               const SizedBox(height: 16),
               _Section(
-                title: 'Status',
+                title: 'Status & Visibility',
                 children: [
                   DropdownButtonFormField<AvailabilityStatus>(
                     value: _availability,
-                    decoration: const InputDecoration(labelText: 'Availability', prefixIcon: Icon(Icons.circle)),
+                    decoration: const InputDecoration(labelText: 'Current Availability', prefixIcon: Icon(Icons.sensors)),
                     items: AvailabilityStatus.values.map((a) => DropdownMenuItem(
                       value: a,
                       child: Row(children: [
                         Container(width: 10, height: 10, decoration: BoxDecoration(color: a.color, shape: BoxShape.circle)),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Text(a.label),
                       ]),
                     )).toList(),
                     onChanged: (v) => setState(() => _availability = v!),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   SwitchListTile(
                     value: _isEmergencyContact,
-                    onChanged: (v) => setState(() => _isEmergencyContact = v),
+                    onChanged: isAdmin ? (v) => setState(() => _isEmergencyContact = v) : null,
                     title: const Text('Emergency Contact'),
-                    subtitle: const Text('Show in emergency contacts list'),
+                    subtitle: const Text('Mark as priority contact for the department'),
                     activeColor: AppTheme.accentCoral,
                   ),
                   SwitchListTile(
                     value: _isActive,
-                    onChanged: (v) => setState(() => _isActive = v),
-                    title: const Text('Active'),
-                    subtitle: const Text('Show in directory'),
+                    onChanged: isAdmin ? (v) => setState(() => _isActive = v) : null,
+                    title: const Text('Directory Visibility'),
+                    subtitle: const Text('Show profile in the public directory'),
                     activeColor: AppTheme.accentGreen,
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _save,
-                  icon: Icon(isEditing ? Icons.save : Icons.person_add),
-                  label: Text(isEditing ? 'Update Staff' : 'Add Staff'),
-                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                  icon: Icon(isUpdating ? Icons.check_circle : Icons.person_add),
+                  label: Text(isUpdating ? 'Save Changes' : 'Create Staff Profile'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryNavy,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 50),
             ],
           ),
         ),
@@ -245,18 +268,18 @@ class _Section extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8)],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 14),
+          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.primaryNavy)),
+          const Divider(height: 24),
           ...children,
         ],
       ),
@@ -270,29 +293,37 @@ class _Field extends StatelessWidget {
   final IconData icon;
   final bool required;
   final int maxLines;
+  final bool enabled;
   final TextInputType? keyboardType;
+
   const _Field({
     required this.controller,
     required this.label,
     required this.icon,
     this.required = false,
     this.maxLines = 1,
+    this.enabled = true,
     this.keyboardType,
   });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: TextFormField(
         controller: controller,
         maxLines: maxLines,
+        enabled: enabled,
         keyboardType: keyboardType,
+        style: TextStyle(color: enabled ? Colors.black87 : Colors.grey),
         decoration: InputDecoration(
           labelText: required ? '$label *' : label,
-          prefixIcon: Icon(icon),
+          prefixIcon: Icon(icon, size: 20),
+          filled: !enabled,
+          fillColor: Colors.grey.shade50,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
-        validator: required ? (v) => v!.isEmpty ? 'Required' : null : null,
+        validator: required ? (v) => v!.isEmpty ? 'This field is required' : null : null,
       ),
     );
   }

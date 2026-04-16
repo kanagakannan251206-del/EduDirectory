@@ -5,7 +5,7 @@ import '../../providers/app_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/common_widgets.dart';
 
-// FIXED: Essential imports for navigation
+// Essential imports for navigation
 import 'staff_detail_screen.dart';
 import 'department_screen.dart';
 import 'emergency_screen.dart';
@@ -21,14 +21,22 @@ class HomeScreen extends StatelessWidget {
     final hour = DateTime.now().hour;
     final greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
 
+    // FIX: logic for "Dr." name display
+    String displayName = user?.name ?? 'Guest';
+    if (user?.role == UserRole.editor && !displayName.startsWith('Dr.')) {
+      displayName = 'Dr. $displayName';
+    }
+
     return Scaffold(
       backgroundColor: AppTheme.surfaceLight,
       body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
         slivers: [
           // --- Custom App Bar ---
           SliverAppBar(
-            expandedHeight: 180,
+            expandedHeight: 160,
             pinned: true,
+            elevation: 0,
             backgroundColor: AppTheme.primaryNavy,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -59,10 +67,10 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  (user?.name ?? 'Guest').split(' ').first,
+                                  displayName,
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 24,
+                                    fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -124,63 +132,94 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // --- Quick Stats (Real-time from Provider) ---
+          // --- Quick Stats (Responsive Row) ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  Expanded(child: _QuickStat(label: 'Faculty', value: '${provider.allStaff.where((s) => s.isActive).length}', icon: Icons.people, color: AppTheme.accentTeal)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _QuickStat(label: 'Dept', value: '${provider.departments.length}', icon: Icons.business, color: AppTheme.accentGold)),
-                  const SizedBox(width: 12),
-                  Expanded(child: _QuickStat(label: 'Available', value: '${provider.allStaff.where((s) => s.availability == AvailabilityStatus.available && s.isActive).length}', icon: Icons.check_circle, color: AppTheme.accentGreen)),
+                  Expanded(
+                    child: _QuickStat(
+                      label: 'Faculty', 
+                      value: '${provider.allStaff.where((s) => s.isActive).length}', 
+                      icon: Icons.people, 
+                      color: AppTheme.accentTeal
+                    )
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _QuickStat(
+                      label: 'Dept', 
+                      value: '${provider.departments.length}', 
+                      icon: Icons.business, 
+                      color: AppTheme.accentGold
+                    )
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _QuickStat(
+                      label: 'Available', 
+                      value: '${provider.allStaff.where((s) => s.availability == AvailabilityStatus.available && s.isActive).length}', 
+                      icon: Icons.check_circle, 
+                      color: AppTheme.accentGreen
+                    )
+                  ),
                 ],
               ),
             ),
           ),
 
-          // --- Emergency Banner ---
+          // --- Emergency Banner (Slim & Professional) ---
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: GestureDetector(
                 onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EmergencyScreen())),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFFF1744), Color(0xFFFF6B6B)],
+                    gradient: LinearGradient(
+                      colors: [Colors.red.shade800, Colors.red.shade900],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(12),
                     boxShadow: [
-                      BoxShadow(color: Colors.red.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 4)),
+                      BoxShadow(
+                        color: Colors.red.withOpacity(0.15), 
+                        blurRadius: 6, 
+                        offset: const Offset(0, 3)
+                      ),
                     ],
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
+                          shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.emergency, color: Colors.white, size: 24),
+                        child: const Icon(Icons.emergency_outlined, color: Colors.white, size: 18),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('Emergency Contacts', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                            const Text(
+                              'Emergency Contacts', 
+                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)
+                            ),
                             Text(
                               '${provider.emergencyContacts.length} contacts available 24/7',
-                              style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12),
+                              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 11),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 12),
                     ],
                   ),
                 ),
@@ -188,7 +227,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // --- Departments Horizontal List ---
+          // --- Departments Section ---
           SliverToBoxAdapter(
             child: SectionHeader(
               title: 'Departments',
@@ -198,7 +237,7 @@ class HomeScreen extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 160,
+              height: 130, 
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -207,7 +246,7 @@ class HomeScreen extends StatelessWidget {
                   final dept = provider.departments[i];
                   final count = provider.departmentStaffCount[dept.name] ?? 0;
                   return Container(
-                    width: 160,
+                    width: 140,
                     margin: const EdgeInsets.only(right: 12),
                     child: DepartmentCard(
                       department: dept,
@@ -225,15 +264,15 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
 
-          // --- Featured Faculty ---
-          const SliverToBoxAdapter(child: SectionHeader(title: 'Faculty Highlights')),
+          // --- Featured Faculty Highlights ---
+          SliverToBoxAdapter(child: SectionHeader(title: 'Faculty Highlights')),
 
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (ctx, i) {
-                final staff = provider.allStaff.where((s) => s.isActive).toList();
-                if (i >= staff.length || i >= 5) return null; 
-                final s = staff[i];
+                final activeStaff = provider.allStaff.where((s) => s.isActive).toList();
+                if (i >= activeStaff.length || i >= 5) return null; 
+                final s = activeStaff[i];
                 return StaffCard(
                   staff: s,
                   isFavorite: provider.isFavorite(s.id),
@@ -244,9 +283,7 @@ class HomeScreen extends StatelessWidget {
                   onFavoriteToggle: () => provider.toggleFavorite(s.id),
                 );
               },
-              childCount: provider.allStaff.where((s) => s.isActive).length > 5 
-                ? 5 
-                : provider.allStaff.where((s) => s.isActive).length,
+              childCount: _getSafeStaffCount(provider.allStaff),
             ),
           ),
 
@@ -256,18 +293,24 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: OutlinedButton.icon(
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DirectoryScreen())),
-                icon: const Icon(Icons.search_sharp),
+                icon: const Icon(Icons.search_sharp, size: 18),
                 label: const Text('Explore All Faculty'),
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 80)),
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );
+  }
+
+  int _getSafeStaffCount(List<StaffMember> list) {
+    final activeCount = list.where((s) => s.isActive).length;
+    return activeCount > 5 ? 5 : activeCount;
   }
 }
 
@@ -282,21 +325,33 @@ class _QuickStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.1)),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 20),
+          Icon(icon, color: color, size: 18),
           const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-              Text(label, style: const TextStyle(fontSize: 10, color: AppTheme.textSecondary, fontWeight: FontWeight.w500)),
-            ],
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  value, 
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: color)
+                ),
+                Text(
+                  label, 
+                  style: const TextStyle(fontSize: 9, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
           ),
         ],
       ),
